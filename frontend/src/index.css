@@ -1,7 +1,11 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 body {
   margin: 0;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #f0f0f3;
+  color: #111827;
+  font-family: 'Inter', system-ui, sans-serif;
 }

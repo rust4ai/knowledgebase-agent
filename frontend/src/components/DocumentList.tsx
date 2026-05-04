@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { type Document, listDocuments, deleteDocument } from '../api';
 
 const STATUS_COLORS: Record<string, string> = {
-  uploaded: 'bg-yellow-500/20 text-yellow-300',
-  processing: 'bg-blue-500/20 text-blue-300',
-  indexed: 'bg-green-500/20 text-green-300',
-  failed: 'bg-red-500/20 text-red-300',
+  uploaded: 'bg-amber-100 text-amber-700',
+  processing: 'bg-blue-100 text-blue-700',
+  indexed: 'bg-green-100 text-green-700',
+  failed: 'bg-red-100 text-red-700',
 };
 
 function formatBytes(bytes: number): string {
@@ -25,7 +25,7 @@ function timeAgo(dateStr: string): string {
 function Spinner() {
   return (
     <svg
-      className="animate-spin h-4 w-4 text-blue-400"
+      className="animate-spin h-3.5 w-3.5"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -50,9 +50,9 @@ function Spinner() {
 function ProgressBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
   return (
-    <div className="w-full bg-slate-700 rounded-full h-1.5 mt-1.5">
+    <div className="w-full bg-gray-100 rounded-full h-1.5 mt-1.5">
       <div
-        className="bg-blue-500 h-1.5 rounded-full transition-all duration-500"
+        className="bg-gray-900 h-1.5 rounded-full transition-all duration-500"
         style={{ width: `${pct}%` }}
       />
     </div>
@@ -65,7 +65,7 @@ function StatusBadge({ doc }: { doc: Document }) {
   return (
     <div className="flex flex-col items-end gap-1 min-w-[120px]">
       <span
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+        className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-medium ${
           STATUS_COLORS[doc.status] || ''
         }`}
       >
@@ -77,7 +77,7 @@ function StatusBadge({ doc }: { doc: Document }) {
       </span>
       {doc.status === 'processing' && doc.page_count != null && doc.page_count > 0 && (
         <div className="w-full">
-          <p className="text-[10px] text-slate-500 text-right">
+          <p className="text-[10px] text-gray-400 text-right">
             {doc.pages_indexed ?? 0}/{doc.page_count} pages
           </p>
           <ProgressBar value={doc.pages_indexed ?? 0} max={doc.page_count} />
@@ -118,12 +118,12 @@ export function DocumentList() {
   };
 
   if (loading) {
-    return <p className="text-slate-500 text-center py-8">Loading documents...</p>;
+    return <p className="text-gray-400 text-center py-8">Loading documents...</p>;
   }
 
   if (docs.length === 0) {
     return (
-      <p className="text-slate-500 text-center py-8">
+      <p className="text-gray-400 text-center py-8">
         No documents yet. Upload one above.
       </p>
     );
@@ -131,36 +131,35 @@ export function DocumentList() {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-medium text-white">
+      <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
         Documents ({docs.length})
       </h2>
-      <div className="divide-y divide-slate-700 rounded-lg border border-slate-700 overflow-hidden">
-        {docs.map((doc) => (
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        {docs.map((doc, i) => (
           <div
             key={doc.id}
-            className="flex items-center gap-4 px-5 py-4 bg-slate-800/50 hover:bg-slate-800 transition-colors"
+            className={`flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors ${
+              i > 0 ? 'border-t border-gray-50' : ''
+            }`}
           >
-            {/* Filename */}
             <div className="flex-1 min-w-0">
-              <p className="text-white font-medium truncate">{doc.filename}</p>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-sm text-gray-900 font-medium truncate">{doc.filename}</p>
+              <p className="text-xs text-gray-400 mt-0.5">
                 {formatBytes(doc.size_bytes)}
                 {doc.page_count != null && ` · ${doc.page_count} pages`}
                 {' · '}
                 {timeAgo(doc.created_at)}
               </p>
               {doc.error_msg && (
-                <p className="text-xs text-red-400 mt-1 truncate">{doc.error_msg}</p>
+                <p className="text-xs text-red-500 mt-1 truncate">{doc.error_msg}</p>
               )}
             </div>
 
-            {/* Status badge with spinner + progress */}
             <StatusBadge doc={doc} />
 
-            {/* Delete */}
             <button
               onClick={() => handleDelete(doc.id)}
-              className="text-slate-500 hover:text-red-400 transition-colors text-sm"
+              className="text-gray-300 hover:text-red-500 transition-colors text-sm"
               title="Delete"
             >
               ✕

@@ -37,19 +37,19 @@ export function Upload({ onUploaded }: { onUploaded: () => void }) {
         setDragging(false);
         handleFiles(e.dataTransfer.files);
       }}
-      className={`border-2 border-dashed rounded-xl p-10 text-center transition-colors ${
+      className={`border-2 border-dashed rounded-2xl p-10 text-center transition-colors bg-white ${
         dragging
-          ? 'border-blue-400 bg-blue-500/10'
-          : 'border-slate-600 hover:border-slate-500'
+          ? 'border-gray-900 bg-gray-50'
+          : 'border-gray-200 hover:border-gray-300'
       }`}
     >
       {uploading ? (
-        <p className="text-slate-400">Uploading...</p>
+        <p className="text-gray-400">Uploading...</p>
       ) : (
         <>
-          <p className="text-slate-400 mb-3">
+          <p className="text-gray-500 mb-3">
             Drag & drop files here, or{' '}
-            <label className="text-blue-400 hover:text-blue-300 cursor-pointer underline">
+            <label className="text-gray-900 font-medium hover:underline cursor-pointer">
               browse
               <input
                 type="file"
@@ -59,12 +59,12 @@ export function Upload({ onUploaded }: { onUploaded: () => void }) {
               />
             </label>
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-gray-400">
             Supports .txt, .md, .pdf, .json, and more
           </p>
         </>
       )}
-      {error && <p className="text-red-400 text-sm mt-3">{error}</p>}
+      {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
     </div>
   );
 }
