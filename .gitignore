@@ -1,0 +1,17 @@
+/target
+.env
+*.swp
+*.swo
+
+# Sample/test documents
+/docs/
+/samples/
+/test-docs/
+*.pdf
+*.docx
+*.doc
+*.pptx
+
+# Frontend build
+/frontend/node_modules
+/frontend/dist
