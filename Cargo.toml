@@ -1,13 +1,13 @@
 [package]
 name = "knowledgebase-agent"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 # Web
 axum = { version = "0.8", features = ["multipart"] }
 tokio = { version = "1", features = ["full"] }
-tower-http = { version = "0.6", features = ["cors", "trace"] }
+tower-http = { version = "0.6", features = ["cors", "trace", "fs"] }
 
 # Database (Neon Postgres)
 sqlx = { version = "0.8", features = [
@@ -24,7 +24,7 @@ sqlx = { version = "0.8", features = [
 rust-s3 = { version = "0.35", features = ["tokio-rustls-tls"], default-features = false }
 
 # Agent
-metalcraft = { path = "../metalcraft", features = ["rig"] }
+metalcraft = { version = "0.3", features = ["rig"] }
 rig = "0.36"
 
 # Serialization

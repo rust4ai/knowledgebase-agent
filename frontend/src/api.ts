@@ -20,10 +20,39 @@ export type QueryResponse = {
   tools_used: string[];
 };
 
+export type AppConfig = {
+  knowledgebase_name: string;
+};
+
+// Admin password stored in localStorage
+export function getAdminPassword(): string {
+  return localStorage.getItem('admin_password') || '';
+}
+
+export function setAdminPassword(password: string) {
+  localStorage.setItem('admin_password', password);
+}
+
+function adminHeaders(): HeadersInit {
+  const pw = getAdminPassword();
+  return pw ? { Authorization: `Bearer ${pw}` } : {};
+}
+
+export async function fetchConfig(): Promise<AppConfig> {
+  const res = await fetch(`${BASE}/config`);
+  if (!res.ok) return { knowledgebase_name: 'Knowledgebase' };
+  return res.json();
+}
+
 export async function uploadDocument(file: File): Promise<Document> {
   const form = new FormData();
   form.append('file', file);
-  const res = await fetch(`${BASE}/documents`, { method: 'POST', body: form });
+  const res = await fetch(`${BASE}/documents`, {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: form,
+  });
+  if (res.status === 401) throw new Error('Unauthorized - check admin password');
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
@@ -41,7 +70,11 @@ export async function getDocument(id: string): Promise<Document> {
 }
 
 export async function deleteDocument(id: string): Promise<void> {
-  const res = await fetch(`${BASE}/documents/${id}`, { method: 'DELETE' });
+  const res = await fetch(`${BASE}/documents/${id}`, {
+    method: 'DELETE',
+    headers: adminHeaders(),
+  });
+  if (res.status === 401) throw new Error('Unauthorized - check admin password');
   if (!res.ok) throw new Error(await res.text());
 }
 

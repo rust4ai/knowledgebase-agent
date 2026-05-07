@@ -2,11 +2,14 @@ use std::sync::Arc;
 
 use axum::routing::{delete, get, post};
 use axum::Router;
+use serde_json::json;
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
+use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::EnvFilter;
 
+mod auth;
 mod config;
 mod controllers;
 mod db;
@@ -65,8 +68,15 @@ async fn main() {
     });
 
     // Routes
-    let app = Router::new()
+    let kb_name = config.knowledgebase_name.clone();
+    let api = Router::new()
         .route("/api/health", get(|| async { "ok" }))
+        .route(
+            "/api/config",
+            get(move || async move {
+                axum::Json(json!({ "knowledgebase_name": kb_name }))
+            }),
+        )
         .route("/api/documents", post(controllers::documents::upload))
         .route("/api/documents", get(controllers::documents::list))
         .route("/api/documents/{id}", get(controllers::documents::get))
@@ -75,9 +85,12 @@ async fn main() {
             delete(controllers::documents::delete),
         )
         .route("/api/query", post(controllers::query::query))
-        .layer(CorsLayer::permissive())
-        .layer(TraceLayer::new_for_http())
         .with_state(state);
+
+    let app = api
+        .fallback_service(ServeDir::new("frontend/dist").fallback(ServeDir::new("frontend/dist")))
+        .layer(CorsLayer::permissive())
+        .layer(TraceLayer::new_for_http());
 
     let addr = format!("{}:{}", config.host, config.port);
     tracing::info!("listening on {addr}");

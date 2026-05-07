@@ -203,9 +203,19 @@ impl Tool for ReadPageTool {
 // RAG Agent builder
 // ---------------------------------------------------------------------------
 
-const RAG_SYSTEM_PROMPT: &str = r#"You are a knowledgebase assistant that answers questions using indexed documents.
+fn build_system_prompt(config: &AppConfig) -> String {
+    let mut prompt = format!(
+        "You are the {} assistant that answers questions using indexed documents.\n\n",
+        config.knowledgebase_name
+    );
 
-Your retrieval process follows the PageIndex method:
+    if let Some(extra) = &config.system_prompt_extra {
+        prompt.push_str(extra);
+        prompt.push_str("\n\n");
+    }
+
+    prompt.push_str(
+        r#"Your retrieval process follows the PageIndex method:
 1. First, use `list_documents` to see what documents are available
 2. Use `search_index` to examine document tree indexes and identify relevant pages
 3. Reason about the index structure: look at themes, page_map, entity_index, and page summaries to decide which pages contain the answer
@@ -217,7 +227,11 @@ Important:
 - If information spans multiple pages, read all relevant pages before answering
 - If no relevant content is found, say so honestly
 - Your reasoning path through the index tree should be traceable — explain why you chose to read specific pages
-- Be concise but thorough in your answers"#;
+- Be concise but thorough in your answers"#,
+    );
+
+    prompt
+}
 
 pub struct RagAgent {
     graph: Arc<CompiledGraph<AgentState>>,
@@ -233,7 +247,8 @@ impl RagAgent {
             .register(SearchIndexTool { db: db.clone() })
             .register(ReadPageTool { db });
 
-        let graph = create_react_agent(model, registry, RAG_SYSTEM_PROMPT)?;
+        let system_prompt = build_system_prompt(config);
+        let graph = create_react_agent(model, registry, &system_prompt)?;
 
         Ok(Self {
             graph: Arc::new(graph),

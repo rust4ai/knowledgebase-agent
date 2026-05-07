@@ -4,6 +4,7 @@ use axum::Json;
 use serde_json::{json, Value};
 use uuid::Uuid;
 
+use crate::auth::AdminAuth;
 use crate::db;
 use crate::error::{AppError, AppResult};
 use crate::services::s3;
@@ -11,6 +12,7 @@ use crate::state::AppState;
 
 /// POST /api/documents - upload a document
 pub async fn upload(
+    _admin: AdminAuth,
     State(state): State<AppState>,
     mut multipart: Multipart,
 ) -> AppResult<(StatusCode, Json<Value>)> {
@@ -75,6 +77,7 @@ pub async fn get(
 
 /// DELETE /api/documents/:id - delete document + S3 object
 pub async fn delete(
+    _admin: AdminAuth,
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
 ) -> AppResult<StatusCode> {

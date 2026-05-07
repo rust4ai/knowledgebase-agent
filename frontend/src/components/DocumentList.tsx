@@ -87,7 +87,7 @@ function StatusBadge({ doc }: { doc: Document }) {
   );
 }
 
-export function DocumentList() {
+export function DocumentList({ isAdmin }: { isAdmin: boolean }) {
   const [docs, setDocs] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -157,13 +157,15 @@ export function DocumentList() {
 
             <StatusBadge doc={doc} />
 
-            <button
-              onClick={() => handleDelete(doc.id)}
-              className="text-gray-300 hover:text-red-500 transition-colors text-sm"
-              title="Delete"
-            >
-              ✕
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => handleDelete(doc.id)}
+                className="text-gray-300 hover:text-red-500 transition-colors text-sm"
+                title="Delete"
+              >
+                ✕
+              </button>
+            )}
           </div>
         ))}
       </div>

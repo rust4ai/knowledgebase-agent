@@ -12,6 +12,9 @@ pub struct AppConfig {
     pub openai_model: String,
     pub host: String,
     pub port: u16,
+    pub admin_password: String,
+    pub knowledgebase_name: String,
+    pub system_prompt_extra: Option<String>,
 }
 
 impl AppConfig {
@@ -30,6 +33,12 @@ impl AppConfig {
                 .unwrap_or_else(|_| "3000".into())
                 .parse()
                 .expect("PORT must be a number"),
+            admin_password: env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD required"),
+            knowledgebase_name: env::var("KNOWLEDGEBASE_NAME")
+                .unwrap_or_else(|_| "Knowledgebase".into()),
+            system_prompt_extra: env::var("SYSTEM_PROMPT_EXTRA")
+                .ok()
+                .filter(|s| !s.is_empty()),
         }
     }
 }
